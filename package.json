@@ -1,0 +1,16 @@
+{
+  "name": "Mentorpedia-Server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": "https://github.com/NavdeepPatel18/Mentorpedia-Server.git",
+  "author": "navdeeppatel1852 <navdeeppatel.1852@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7"
+  }
+}
