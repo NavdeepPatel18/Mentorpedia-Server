@@ -1,6 +1,6 @@
 const userRoutes = (app, fs) => {
   // variables
-  const dataPath = "./Data/temp.json";
+  const dataPath = "./Data/data_iit_all - Copy.json";
 
   // READ Faculty name
   app.get("/faculty-name", (req, res) => {
@@ -10,9 +10,9 @@ const userRoutes = (app, fs) => {
       }
 
       var obj = JSON.parse(data);
-      var x = { faculty_name: []};
+      var x = { facultyname: []};
       for (i = 0; i < obj.length; i++) {
-        x.faculty_name.push(obj[i]["name"]);
+        x.facultyname.push({name: obj[i]["name"]});
       }
       res.send(x);
       // console.log(obj.length);
@@ -102,6 +102,20 @@ const userRoutes = (app, fs) => {
         x.research_areas.push(obj[i]["research_areas"]);
       }
       res.send(x);
+      // console.log(obj.length);
+    });
+  });
+
+  // READ  all data with all attributes
+  app.get("/iits-data", (req, res) => {
+    fs.readFile(dataPath, "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+
+      var obj = JSON.parse(data);
+      
+      res.send(obj);
       // console.log(obj.length);
     });
   });
