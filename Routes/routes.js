@@ -20,6 +20,12 @@ const appRouter = (app, fs) => {
     res.json(data);
   });
 
+  app.get('/search_csv', async (req, res) => {
+    const { phraseSearch_csv } = require('./Search_csv');
+    const data = await phraseSearch_csv(req.query.q);
+    res.json(data);
+  });
+
   // run our user route module here to complete the wire up
   userRoutes(app, fs);
 };
