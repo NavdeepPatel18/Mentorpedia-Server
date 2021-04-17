@@ -8,24 +8,6 @@ const appRouter = (app, fs) => {
     res.send('welcome to the development api-server');
   });
 
-  app.get('/search', async (req, res) => {
-    const { phraseSearch } = require('./search');
-    const data = await phraseSearch(req.query.q);
-    res.json(data);
-  });
-
-  app.get('/explicit_search/:field', async (req, res) => {
-    const { phraseexplicitSearch } = require('./explicit_search');
-    const data = await phraseexplicitSearch(req.params.field , req.query.q);
-    res.json(data);
-  });
-
-  app.get('/search_csv', async (req, res) => {
-    const { phraseSearch_csv } = require('./Search_csv');
-    const data = await phraseSearch_csv(req.query.q);
-    res.json(data);
-  });
-
   // run our user route module here to complete the wire up
   userRoutes(app, fs);
 };

@@ -1,123 +1,104 @@
-const userRoutes = (app, fs) => {
-  // variables
-  const dataPath = "./Data/data_iit_all - Copy.json";
+function data_processing(Result) {
+  const data = [];
 
-  // READ Faculty name
-  app.get("/faculty-name", (req, res) => {
-    fs.readFile(dataPath, "utf8", (err, data) => {
-      if (err) {
-        throw err;
-      }
+  console.log("enter in data processing");
+  console.log(Result.length)
+  if (Result.length > 0) {
+    for (i = 0; i < Result.length; i++) {
+      console.log(Result[i].length)
+      if (Result[i].length > 0) {
+        console.log("hello")
+        for (j = 0; j < Result[i].length; j++) {
 
-      var obj = JSON.parse(data);
-      var x = { facultyname: []};
-      for (i = 0; i < obj.length; i++) {
-        x.facultyname.push({name: obj[i]["name"]});
-      }
-      res.send(x);
-      // console.log(obj.length);
-    });
-  });
+          // console.log(Result[i][j])
+          if (!data.some((hit) => hit._id === Result[i][j]._id)) {
+            console.log(Result[i][j]._id  + "   "  + Result[i][j]._source["name"])
 
-  
-  // READ collage name
-  app.get("/collage", (req, res) => {
-    fs.readFile(dataPath, "utf8", (err, data) => {
-      if (err) {
-        throw err;
-      }
+            if (!Result[i][j]._source.hasOwnProperty("position")) {
+              Result[i][j]._source["position"] = [null];
+            } else {
+              Result[i][j]._source["position"] = Result[i][j]._source[
+                "position"
+              ].split(",");
+            }
 
-      var obj = JSON.parse(data);
-      var x = { college: []};
-      for (i = 0; i < obj.length; i++) {
-        if (x.college.includes(obj[i]["college"]) === false)
-          x.college.push(obj[i]["college"]);
-      }
-      res.send(x);
-      // console.log(obj.length);
-    });
-  });
+            if (!Result[i][j]._source.hasOwnProperty("research_areas")) {
+              Result[i][j]._source["research_areas"] = [null];
+            } else {
+              Result[i][j]._source["research_areas"] = Result[i][j]._source[
+                "research_areas"
+              ].split(",");
+            }
 
+            if (!Result[i][j]._source.hasOwnProperty("email")) {
+              Result[i][j]._source["email"] = null;
+            }
 
-  // READ department name
-  app.get("/dept", (req, res) => {
-    fs.readFile(dataPath, "utf8", (err, data) => {
-      if (err) {
-        throw err;
-      }
+            if (!Result[i][j]._source.hasOwnProperty("phone")) {
+              Result[i][j]._source["phone"] = null;
+            }
 
-      var obj = JSON.parse(data);
-      var x = { dept: [] };
-      for (i = 0; i < obj.length; i++) {
-        if (x.dept.includes(obj[i]["dept"]) === false)
-          x.dept.push(obj[i]["dept"]);
-      }
-      res.send(x);
-      // console.log(obj.length);
-    });
-  });
-
-
-  // READ  research areas
-  app.get("/research-areas", (req, res) => {
-    fs.readFile(dataPath, "utf8", (err, data) => {
-      if (err) {
-        throw err;
-      }
-
-      var obj = JSON.parse(data);
-      var x = { research_areas: [] };
-      for (i = 0; i < obj.length; i++) {
-
-        if(obj[i]["research_areas"].constructor === Array){
-          for(j=0;j<obj[i]["research_areas"].length;j++){
-            x.research_areas.push(obj[i]["research_areas"][j]);
+            data.push(Result[i][j]);
           }
         }
-        else
-          x.research_areas.push(obj[i]["research_areas"]);
+        console.log(data.length)
+        console.log("End of loop")
+        console.log("")
+        console.log("")
+        console.log("")
       }
-      res.send(x);
-      // console.log(obj.length);
-    });
-  });
-
-  // READ  all data of all collage
-  app.get("/iits", (req, res) => {
-    fs.readFile(dataPath, "utf8", (err, data) => {
-      if (err) {
-        throw err;
-      }
-
-      var obj = JSON.parse(data);
-      var x = { faculty_name: [], college: [], dept: [], research_areas: [] };
-      for (i = 0; i < obj.length; i++) {
-        x.faculty_name.push(obj[i]["name"]);
-        if (x.college.includes(obj[i]["college"]) === false)
-          x.college.push(obj[i]["college"]);
-
-        if (x.dept.includes(obj[i]["dept"]) === false)
-          x.dept.push(obj[i]["dept"]);
-
-        x.research_areas.push(obj[i]["research_areas"]);
-      }
-      res.send(x);
-      // console.log(obj.length);
-    });
-  });
-
-  // READ  all data with all attributes
-  app.get("/iits-data", (req, res) => {
-    fs.readFile(dataPath, "utf8", (err, data) => {
-      if (err) {
-        throw err;
-      }
-
-      var obj = JSON.parse(data);
       
-      res.send(obj);
-      // console.log(obj.length);
+    }
+
+    return {
+      hitCount: data.length,
+      data,
+    };
+  }
+}
+
+const userRoutes = (app, fs) => {
+  // variables
+  const { multi_match_Search_csv } = require("./Search_csv");
+
+  // READ Faculty name
+  app.get("/search", async (req, res) => {
+    const { phraseSearch } = require("./search");
+    const data = await phraseSearch(req.query.q);
+    res.json(data);
+  });
+
+  app.get("/explicit_search/:field", async (req, res) => {
+    const { phraseexplicitSearch } = require("./explicit_search");
+    const data = phraseexplicitSearch(req.params.field, req.query.q);
+    res.json(data);
+  });
+
+  app.get("/search_csv", async (req, res) => {
+    let phrase = req.query.q;
+    const search = []
+    search[0] = phrase
+    // const search = phrase.split(" ");
+    if (phrase.split(" ").length > 1) {
+      search.push(...phrase.split(" "));
+    }
+
+    console.log(search)
+
+    console.log("Start");
+
+    const promises = search.map(async (searchdata) => {
+      const temp = await multi_match_Search_csv(searchdata);
+      return temp;
     });
+
+    const data = await Promise.all(promises);
+    const hits = data_processing(data);
+
+    console.log("End");
+    console.log("exite api call");
+
+    res.json(hits);
   });
 };
 

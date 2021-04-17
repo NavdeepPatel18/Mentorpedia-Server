@@ -7,48 +7,54 @@ const phraseSearch = async (phrase) => {
 
   // only string values are searchable
 
-  const multi_match_Result = await client
-    .search({
-      index: "my_test_search",
-      type: "_doc",
-      body: {
-        query: {
-          bool: {
-            must: [
-              {
-                multi_match: {
-                  query: phrase[0].toUpperCase() + phrase.slice(1),
-                  fields: ["research_areas*", "name", "college", "dept"],
-                },
-              },
-            ],
-            filter: [],
-            should: [],
-            must_not: [],
-          },
-        },
-      },
-    })
-    .catch((e) => console.log("errr", e));
-  if (
-    multi_match_Result &&
-    multi_match_Result.body &&
-    multi_match_Result.body.hits &&
-    multi_match_Result.body.hits.hits &&
-    multi_match_Result.body.hits.hits.length > 0
-  ) {
-    for (i = 0; i < multi_match_Result.body.hits.hits.length; i++) {
-      if (hits.indexOf(multi_match_Result.body.hits.hits[i]._id) == -1) {
-        hits.push(multi_match_Result.body.hits.hits[i]);
-      }
-    }
-  }
+  // const multi_match_Result = await client
+  //   .search({
+  //     index: "my_test_csv",
+  //     type: "_doc",
+  //     body: {
+  //       query: {
+  //         bool: {
+  //           must: [
+  //             {
+  //               multi_match: {
+  //                 query: phrase[0].toUpperCase() + phrase.slice(1),
+  //                 fields: ["research_areas*", "name", "college", "dept"],
+  //               },
+  //             },
+  //           ],
+  //           filter: [],
+  //           should: [],
+  //           must_not: [],
+  //         },
+  //       },
+  //     },
+  //   })
+  //   .catch((e) => console.log("errr", e));
+  // if (
+  //   multi_match_Result &&
+  //   multi_match_Result.body &&
+  //   multi_match_Result.body.hits &&
+  //   multi_match_Result.body.hits.hits &&
+  //   multi_match_Result.body.hits.hits.length > 0
+  // ) {
+  //   for (i = 0; i < multi_match_Result.body.hits.hits.length; i++) {
+  //     if (
+  //       !hits.some(
+  //         (hit) => hit._id === multi_match_Result.body.hits.hits[i]._id
+  //       )
+  //     ) {
+  //       hits.push(multi_match_Result.body.hits.hits[i]);
+  //     }
+  //   }
+  // }
 
   for (i = 0; i < search.length; i++) {
     // only string values are searchable
+
+    console.log(search[i]);
     const multi_match_Result = await client
       .search({
-        index: "my_test_search",
+        index: "my_test_csv",
         type: "_doc",
         body: {
           query: {
@@ -77,7 +83,11 @@ const phraseSearch = async (phrase) => {
       multi_match_Result.body.hits.hits.length > 0
     ) {
       for (i = 0; i < multi_match_Result.body.hits.hits.length; i++) {
-        if (hits.indexOf(multi_match_Result.body.hits.hits[i]._id) == -1) {
+        if (
+          !hits.some(
+            (hit) => hit._id === multi_match_Result.body.hits.hits[i]._id
+          )
+        ) {
           hits.push(multi_match_Result.body.hits.hits[i]);
         }
       }
@@ -86,9 +96,10 @@ const phraseSearch = async (phrase) => {
 
   for (i = 0; i < search.length; i++) {
     // only string values are searchable
+    console.log(search[i]);
     const query_string_research_areas_Result = await client
       .search({
-        index: "my_test_search",
+        index: "my_test_csv",
         type: "_doc",
         body: {
           query: {
@@ -96,7 +107,8 @@ const phraseSearch = async (phrase) => {
               must: [
                 {
                   query_string: {
-                    query: search[i][0].toUpperCase() + search[i].slice(1) + "*",
+                    query:
+                      search[i][0].toUpperCase() + search[i].slice(1) + "*",
                     fields: ["research_areas*", "name", "college", "dept"],
                   },
                 },
@@ -122,14 +134,18 @@ const phraseSearch = async (phrase) => {
         i++
       ) {
         if (
-          hits.indexOf(
-            query_string_research_areas_Result.body.hits.hits[i]._id
-          ) == -1
+          !hits.some(
+            (hit) => hit._id === query_string_research_areas_Result.body.hits.hits[i]._id
+          )
         ) {
           hits.push(query_string_research_areas_Result.body.hits.hits[i]);
         }
       }
     }
+  }
+
+  for (i = 0; i < hits.length; i++) {
+    console.log(hits[i]._id + "  " + hits[i]._source["name"]);
   }
 
   return {
