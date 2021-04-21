@@ -1,18 +1,18 @@
 function data_processing(Result) {
   const data = [];
 
-  console.log("enter in data processing");
-  console.log(Result.length)
+  // console.log("enter in data processing");
+  // console.log(Result.length)
   if (Result.length > 0) {
     for (i = 0; i < Result.length; i++) {
-      console.log(Result[i].length)
+      // console.log(Result[i].length)
       if (Result[i].length > 0) {
-        console.log("hello")
+        // console.log("hello")
         for (j = 0; j < Result[i].length; j++) {
 
           // console.log(Result[i][j])
           if (!data.some((hit) => hit._id === Result[i][j]._id)) {
-            console.log(Result[i][j]._id  + "   "  + Result[i][j]._source["name"])
+            // console.log(Result[i][j]._id  + "   "  + Result[i][j]._source["name"])
 
             if (!Result[i][j]._source.hasOwnProperty("position")) {
               Result[i][j]._source["position"] = [null];
@@ -41,11 +41,11 @@ function data_processing(Result) {
             data.push(Result[i][j]);
           }
         }
-        console.log(data.length)
-        console.log("End of loop")
-        console.log("")
-        console.log("")
-        console.log("")
+        // console.log(data.length)
+        // console.log("End of loop")
+        // console.log("")
+        // console.log("")
+        // console.log("")
       }
       
     }
@@ -83,9 +83,9 @@ const userRoutes = (app, fs) => {
       search.push(...phrase.split(" "));
     }
 
-    console.log(search)
+    // console.log(search)
 
-    console.log("Start");
+    // console.log("Start");
 
     const promises = search.map(async (searchdata) => {
       const temp = await multi_match_Search_csv(searchdata);
@@ -95,8 +95,8 @@ const userRoutes = (app, fs) => {
     const data = await Promise.all(promises);
     const hits = data_processing(data);
 
-    console.log("End");
-    console.log("exite api call");
+    // console.log("End");
+    // console.log("exite api call");
 
     res.json(hits);
   });
