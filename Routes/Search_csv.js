@@ -9,21 +9,12 @@ function multi_match(data) {
         must: [
           {
             query_string: {
-              fields: ["research_areas", "name", "college"],
+              fields: ["research_areas", "name", "college" , "dept"],
               query: data + "*",
               fuzziness: "AUTO",
             },
           },
-        ],
-        should: [
-          {
-            multi_match: {
-              query: data,
-              type: "phrase_prefix",
-              fields: ["research_areas*", "name", "college", "dept"],
-            },
-          },
-        ],
+        ]
       },
     },
   };
@@ -35,7 +26,7 @@ const multi_match_Search_csv = async (phrase) => {
 
   await client
     .search({
-      index: "my_test_csv",
+      index: "my_final_set",
       type: "_doc",
       body: multi_match(phrase),
     })
